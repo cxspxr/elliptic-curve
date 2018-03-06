@@ -9,3 +9,26 @@ const G = {
     x: new Big("55066263022277343669578718895168534326250603453777594175500187360389116729240"),
     y: new Big("32670510020758816978083085130507043184471273380659243275938904335757337482424")
 };
+
+// const privateKey = new Big("72759466100064397073952777052424474334519735946222029294952053344302920927294");
+
+function modInverse(a, n) {
+    var lm = new Big(1),
+        hm = new Big(0);
+
+    var low = a.mod(n),
+        high = n;
+
+    while( low.gt(new Big(1)) ) {
+        let ratio = high.minus( high.mod(low) ).div(low);
+        nm = hm.minus( lm.times(ratio) );
+        let newHigh = high.minus( low.times(ratio) );
+
+        hm = lm;
+        lm = nm;
+        high = low;
+        low = newHigh;
+    }
+
+    return lm.mod(n);
+}
