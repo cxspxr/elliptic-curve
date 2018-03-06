@@ -32,3 +32,19 @@ function modInverse(a, n) {
 
     return lm.mod(n);
 }
+
+function ECadd(a, b) {
+    var lambda = b[1].minus(a[1])
+        .times( modInverse(b[0].minus(a[0]), provenPrime) )
+        .mod(provenPrime);
+    var x = lambda.times(lambda)
+        .minus(a[0])
+        .minus(b[0])
+        .mod(provenPrime);
+
+    var y = lambda.times( a[0].minus(x) )
+        .minus(a[1])
+        .mod(provenPrime);
+
+    return [x, y];
+}
