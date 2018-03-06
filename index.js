@@ -48,3 +48,22 @@ function ECadd(a, b) {
 
     return [x, y];
 }
+
+function ECdouble(a) {
+    var lambda = (new Big(3))
+        .times(a[0])
+        .times(a[0])
+        .plus(Aparam)
+        .times( modInverse( (new Big(2)).times(a[1]), provenPrime ) )
+        .mod(provenPrime);
+
+    var x = lambda.times(lambda)
+        .minus( (new Big(2)).times(a[0]) )
+        .mod(provenPrime);
+
+    var y = lambda.times( a[0].minus(x) )
+        .minus(a[1])
+        .mod(provenPrime);
+
+    return [x, y];
+}
