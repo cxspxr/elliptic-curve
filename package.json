@@ -1,0 +1,22 @@
+{
+  "name": "elliptic-curve",
+  "version": "1.0.0",
+  "description": "Elliptic Curve KeyPair Algorithm",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/caspermadara/elliptic-curve.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/caspermadara/elliptic-curve/issues"
+  },
+  "homepage": "https://github.com/caspermadara/elliptic-curve#readme",
+  "dependencies": {
+    "big.js": "^5.0.3"
+  }
+}
