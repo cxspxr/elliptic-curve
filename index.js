@@ -129,9 +129,9 @@ function genCompressedPublicKey(privKey) {
     var publicKey = ECMultiply(G, privKey);
 
     if( publicKey[1].mod(2) == "1" )
-        return "03" + publicKey[0].to(16);
+        return "03" + publicKey[0].to(16).zfill(64);
     else
-        return "02" + publicKey[0].to(16);
+        return "02" + publicKey[0].to(16).zfill(64);
 }
 
 console.log(genCompressedPublicKey(privateKey));
