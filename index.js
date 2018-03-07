@@ -17,7 +17,7 @@ Big.prototype.intDivide = function(b) {
 }
 
 Big.prototype.to = function(base) {
-    var converted = [],
+    var converted = '',
         table = {
             "10": "a",
             "11": "b",
@@ -35,11 +35,11 @@ Big.prototype.to = function(base) {
             remainder = table[remainder];
         }
 
-        converted.unshift(remainder);
+        converted = remainder + converted;
         a = a.intDivide(new Big(base));
     }
 
-    return converted.join('');
+    return converted;
 }
 
 String.prototype.zfill = function(width) {
