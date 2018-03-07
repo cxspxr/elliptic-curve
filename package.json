@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/caspermadara/elliptic-curve#readme",
   "dependencies": {
-    "big.js": "^5.0.3"
+    "big.js": "^5.0.3",
+    "decimal.js": "^9.0.1"
   }
 }

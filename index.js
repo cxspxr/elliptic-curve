@@ -4,15 +4,51 @@ const Big = require('big.js');
 const provenPrime = new Big("115792089237316195423570985008687907853269984665640564039457584007908834671663");
 const N = new Big("115792089237316195423570985008687907852837564279074904382605163141518161494337");
 const Aparam = new Big(0);
-const Bparam = new Big(0);
-const G = {
-    x: new Big("55066263022277343669578718895168534326250603453777594175500187360389116729240"),
-    y: new Big("32670510020758816978083085130507043184471273380659243275938904335757337482424")
-};
+const Bparam = new Big(7);
+const G = [
+    new Big("55066263022277343669578718895168534326250603453777594175500187360389116729240"),
+    new Big("32670510020758816978083085130507043184471273380659243275938904335757337482424")
+];
 
-// const privateKey = new Big("72759466100064397073952777052424474334519735946222029294952053344302920927294");
+const privateKey = new Big("7275946610006439707395277705242447433451973594622202929495205334430292092729");
 
-function modInverse(a, n) {
+Big.prototype.intDivide = function(b) {
+    return this.minus( this.mod(b) ).div(b);
+}
+
+Big.prototype.to = function(base) {
+    var converted = [],
+        table = {
+            "10": "a",
+            "11": "b",
+            "12": "c",
+            "13": "d",
+            "14": "e",
+            "15": "f"
+        };
+
+    a = this;
+
+    while( a.gte(new Big(1)) ) {
+        let remainder = a.mod(new Big(base)).toFixed();
+        if( +remainder > 9) {
+            remainder = table[remainder];
+        }
+
+        converted.unshift(remainder);
+        a = a.intDivide(new Big(base));
+    }
+
+    return converted.join('');
+}
+
+String.prototype.zfill = function(width) {
+    return Array(this.length - width).fill(0).join('') + this;
+}
+
+Big.prototype.modInverse = function(n) {
+    var a = this;
+
     var lm = new Big(1),
         hm = new Big(0);
 
@@ -20,7 +56,7 @@ function modInverse(a, n) {
         high = n;
 
     while( low.gt(new Big(1)) ) {
-        let ratio = high.minus( high.mod(low) ).div(low);
+        let ratio = high.intDivide(low);
         nm = hm.minus( lm.times(ratio) );
         let newHigh = high.minus( low.times(ratio) );
 
@@ -33,9 +69,9 @@ function modInverse(a, n) {
     return lm.mod(n);
 }
 
-function ECadd(a, b) {
+function ECAdd(a, b) {
     var lambda = b[1].minus(a[1])
-        .times( modInverse(b[0].minus(a[0]), provenPrime) )
+        .times( b[0].minus(a[0].modInverse(provenPrime)) )
         .mod(provenPrime);
     var x = lambda.times(lambda)
         .minus(a[0])
@@ -49,12 +85,12 @@ function ECadd(a, b) {
     return [x, y];
 }
 
-function ECdouble(a) {
+function ECDouble(a) {
     var lambda = (new Big(3))
         .times(a[0])
         .times(a[0])
         .plus(Aparam)
-        .times( modInverse( (new Big(2)).times(a[1]), provenPrime ) )
+        .times( (new Big(2)).times(a[1].modInverse(provenPrime)) )
         .mod(provenPrime);
 
     var x = lambda.times(lambda)
@@ -67,3 +103,35 @@ function ECdouble(a) {
 
     return [x, y];
 }
+
+function ECMultiply(genPoint, privKey) {
+    if( privKey.eq(new Big(0)) || privKey.gte(N) ) {
+        throw new Error('Invalid Private Key');
+        return;
+    }
+
+    var binaryPrivate = privKey.to(2),
+        q = genPoint;
+
+    var len = binaryPrivate.length;
+
+    for(var i = 1; i <= len; i++ ) {
+        q = ECDouble(q);
+        if(binaryPrivate[i] == "1") {
+            q = ECAdd(q, genPoint);
+        }
+    }
+
+    return q;
+}
+
+function genCompressedPublicKey(privKey) {
+    var publicKey = ECMultiply(G, privKey);
+
+    if( publicKey[1].mod(2) == "1" )
+        return "03" + publicKey[0].to(16);
+    else
+        return "02" + publicKey[0].to(16);
+}
+
+console.log(genCompressedPublicKey(privateKey));
